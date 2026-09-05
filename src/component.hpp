@@ -2,6 +2,7 @@
 
 #include "types.hpp"
 
+#include <bitset>
 #include <iostream>
 #include <memory>
 #include <typeindex>
@@ -108,13 +109,25 @@ class ComponentManager {
 		}
 
 		template <typename Component>
-		Component& add(ID id) { return getSparseSet<Component>()->add(id); }
+		Component& addComponent(ID id) { return getSparseSet<Component>()->add(id); }
 
 		template <typename Component>
-		Component& get(ID id) { return getSparseSet<Component>()->get(id); }
+		void deleteComponent(ID id) { getSparseSet<Component>()->del(id); }
 
 		template <typename Component>
-		void del(ID id) { getSparseSet<Component>()->del(id); }
+		Component& getComponent(ID id) { return getSparseSet<Component>()->get(id); }
+
+
+		void deleteAllComponents(ID id, Bitmask bm) {
+			std::bitset<32> bs = std::bitset<32>(bm);
+			for (size_t i = 0; i < bs.size(); i++) {
+				if (bs[i]) {
+					// i is the index into components vector for given component
+					auto& sparseSet = components[i];
+					sparseSet->del(id);
+				}
+			}
+		}
 
 		template <typename... Components>
 		std::vector<ID> getSmallest() {

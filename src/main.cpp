@@ -12,24 +12,18 @@ class TestSystem : public System {
 
 int main(void) {
 	ECS ecs;
-	ecs.registerSystem(std::make_unique<TestSystem>());
-	
-	for (int i = 0; i < 5; i++) {
-		ID rock = ecs.addEntity();
-		ecs.addComponent<B>(rock);
-	}
-		
-	for (int i = 0; i < 5; i++) {
-		ID rock = ecs.addEntity();
-		ecs.addComponent<B>(rock);
-		ecs.addComponent<D>(rock);
-	}
-	
-	for (ID entity : ecs.queryComponents<B, D>()) {
-		std::cout << entity << std::endl;
-	}
 
-	ecs.updateSystems();
+	ID rock = ecs.addEntity();
+	
+	ecs.addComponent<B>(rock) = { .b = 2 };
+	ecs.addComponent<D>(rock) = { .d = 5 };
+
+	std::cout << ecs.getComponent<B>(rock).b + ecs.getComponent<D>(rock).d << std::endl;
+
+	ecs.deleteComponent<B>(rock);
+	ecs.deleteEntity(rock);
+
+	std::cout << ecs.getComponent<B>(rock).b + ecs.getComponent<D>(rock).d << std::endl;
 
 	return 0;
 }

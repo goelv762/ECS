@@ -9,12 +9,24 @@
 
 class EntityManager {
 	public:
-		ID add() {
-			// TODO freed IDs recycling
-			// -> add delete entity function!
-			ID id = currentID ++;
+		ID addEntity() {
+			ID id{ 0 };
+
+			if (!recycle.empty()) {
+				// recycles oldest deleted first
+				id = recycle[0];
+				recycle.erase(recycle.begin());
+			} else {
+				id = currentID ++;
+			}
+
 			bitmasks[id] = 0;
 			return id;
+		}
+
+		void deleteEntity(ID id) {
+			recycle.push_back(id);
+			bitmasks.erase(id);
 		}
 
 		bool exists(ID id) {
@@ -25,8 +37,14 @@ class EntityManager {
 			return bitmasks[id];
 		}
 
-		void updateBitmask(ID id, uint8_t typeIndex) {
+		void addToBitmask(ID id, uint8_t typeIndex) {
+			// set to 1
 			bitmasks[id] |= 1u << typeIndex;
+		}
+
+		void deleteFromBitmask(ID id, uint8_t typeIndex) {
+			// set to 0
+			bitmasks[id] &= ~(1u << typeIndex);
 		}
 		
 		template <typename ... Components>
@@ -40,6 +58,7 @@ class EntityManager {
 	
 	private:
 		ID currentID{ 0 };
+		std::vector<ID> recycle;
 		std::unordered_map<ID, Bitmask> bitmasks;
 };
 

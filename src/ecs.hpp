@@ -1,5 +1,3 @@
-// archetype based ECS
-
 #include <any>
 #include <bitset>
 #include <cstdint>
@@ -14,36 +12,20 @@
 #include "component.hpp"
 #include "system.hpp"
 
-class System {
-	public:
-		virtual void update(ComponentManager& cm, EntityManager& em) = 0;
-};
-
-
-class SystemManager {
-	public:
-		// use emplace back to add system
-		// e.g. registerSystem(std::make_unique<SomeSystem>());
-		void registerSystem(std::unique_ptr<System> system) {
-			systems.push_back(std::move(system));
-		}
-
-		void updateAll(ComponentManager& cm, EntityManager& em) {
-			for (auto& systemPtr : systems) {
-				systemPtr->update(cm, em);
-			}
-		}
-
-		std::vector<std::unique_ptr<System>> systems;
-};
-
 class ECS {
 	public:
 		// em functions
-		ID addEntity() { return em.add(); }
+		ID addEntity() { return em.addEntity(); }
+
+		void deleteEntity(ID id) {
+			cm.deleteAllComponents(id, em.getBitmask(id));
+			em.deleteEntity(id);
+		}
+
 		bool entityExists(ID id) { return em.exists(id); }
 		Bitmask getEntityBitmask(ID id) { return em.getBitmask(id); }
-		void updateBitmask(ID id, uint8_t typeIndex) { em.updateBitmask(id, typeIndex); }
+		void addToBitmask(ID id, uint8_t typeIndex) { em.addToBitmask(id, typeIndex); }
+		void deleteFromBitmask(ID id, uint8_t typeIndex) { em.deleteFromBitmask(id, typeIndex); }
 
 		// cm functions
 		template <typename Component>
@@ -61,16 +43,34 @@ class ECS {
 				cm.registry[typeid(Component)] = cm.components.size() - 1;
 			}
 
-			em.updateBitmask(id, cm.registry[typeid(Component)]);
+			em.addToBitmask(id, cm.registry[typeid(Component)]);
 
-			return cm.add<Component>(id); 
+			return cm.addComponent<Component>(id); 
 		}
 
 		template <typename Component>
-		Component& getComponent(ID id) { return cm.get<Component>(id); }
+		void deleteComponent(ID id) {
+			// check if entity exists yet
+			if (!em.exists(id)) {
+				std::cerr << "No entity exists with id no. " << id << std::endl;
+				exit(em.exists(id));
+			}
+
+			// check if the component is registered
+			if (cm.registry.find(typeid(Component)) == cm.registry.end()) {
+				// if not registered, register !!
+				cm.components.push_back(std::make_unique<SparseSet<Component>>());
+				cm.registry[typeid(Component)] = cm.components.size() - 1;
+			}
+
+			em.deleteFromBitmask(id, cm.registry[typeid(Component)]);
+
+			return cm.deleteComponent<Component>(id);
+		}
 
 		template <typename Component>
-		void deleteComponent(ID id) { cm.del<Component>(id); }
+		Component& getComponent(ID id) { return cm.getComponent<Component>(id); }
+
 
 		template <typename... Components>
 		std::vector<ID> queryComponents() {
