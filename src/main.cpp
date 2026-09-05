@@ -14,9 +14,13 @@ int main(void) {
 	ECS ecs;
 
 	ID rock = ecs.addEntity();
+	ID stone = ecs.addEntity();
 	
 	ecs.addComponent<B>(rock) = { .b = 2 };
 	ecs.addComponent<D>(rock) = { .d = 5 };
+
+	ecs.addComponent<B>(stone);
+	ecs.addComponent<A>(stone);
 
 	std::cout << ecs.getComponent<B>(rock).b + ecs.getComponent<D>(rock).d << std::endl;
 

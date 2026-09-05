@@ -79,7 +79,6 @@ class ECS {
 
 			// create the bitmask to compare to
 			Bitmask target = em.generateBitMask<Components ...>(cm);
-			// std::cout << std::bitset<32>(bitmask) << std::endl;
 			
 			// vector to store successful candidates in
 			std::vector<ID> matches{};

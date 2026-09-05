@@ -3,6 +3,7 @@
 #include "types.hpp"
 
 #include <bitset>
+#include <climits>
 #include <iostream>
 #include <memory>
 #include <typeindex>
@@ -119,13 +120,15 @@ class ComponentManager {
 
 
 		void deleteAllComponents(ID id, Bitmask bm) {
-			std::bitset<32> bs = std::bitset<32>(bm);
-			for (size_t i = 0; i < bs.size(); i++) {
-				if (bs[i]) {
-					// i is the index into components vector for given component
-					auto& sparseSet = components[i];
-					sparseSet->del(id);
-				}
+			while (bm != 0) {
+				// index of lowest bit (gives the index of the least sig non zero bit)
+				int idx = std::countr_zero(bm);
+
+				auto& sparseSet = components[idx];
+				sparseSet->del(id);
+				
+				// clear lowest bit to get next non zero lsb
+				bm &= bm - 1;
 			}
 		}
 
