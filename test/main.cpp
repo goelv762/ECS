@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ecs.hpp"
+#include "ecs/ecs.hpp"
 struct A { int a; };
 struct B { int b; };
 struct C { int c; };
