@@ -97,29 +97,8 @@ class ECS {
 		void registerSystem(std::unique_ptr<System> system) { sm.registerSystem(std::move(system)); }
 		void updateSystems() { sm.updateAll(cm, em); }
 
-
 	private:
-		template <typename Resource>
-		Resource* getResource() {
-			// itterate over all resources, auto is required as they are different types
-			for (auto& item : resources) {
-				// check if the type is the one we are looking for
-				if (item.type() == typeid(Resource)) {
-					// return the pointer to the resource
-					return &std::any_cast<Resource&>(item);
-				}
-			}
-			
-			// if not found, return nullptr
-			return nullptr;
-		}
-
 		EntityManager em;
 		ComponentManager cm;
 		SystemManager sm;
-
-		// can be used in any system as additional information (global info)
-		// this is probably crap for memory efficency due to all resources being of different types
-		// but idk how else to do this (smart pointers system like system manager seems restrictive due to base class req)
-		std::vector<std::any> resources;
 };
