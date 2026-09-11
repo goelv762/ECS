@@ -1,9 +1,15 @@
+#pragma once
+
 #include "component.hpp"
 #include "entity.hpp"
 
+// forward declaration
+class ECS;
+
 class System {
 	public:
-		virtual void update(ComponentManager& cm, EntityManager& em) = 0;
+		virtual void update(ECS& ecs) = 0;
+		virtual ~System() = default;
 };
 
 
@@ -15,11 +21,11 @@ class SystemManager {
 			systems.push_back(std::move(system));
 		}
 
-		void updateAll(ComponentManager& cm, EntityManager& em) {
+		void updateAll(ECS& ecs) {
 			for (auto& systemPtr : systems) {
-				systemPtr->update(cm, em);
+				systemPtr->update(ecs);
 			}
 		}
-
+		
 		std::vector<std::unique_ptr<System>> systems;
 };

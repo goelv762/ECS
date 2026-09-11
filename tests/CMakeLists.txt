@@ -13,8 +13,9 @@ FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
 add_executable(ecs_tests
-    component.cpp
-    entity.cpp
+    entity.cc
+    component.cc
+	system.cc
 )
 
 target_link_libraries(ecs_tests

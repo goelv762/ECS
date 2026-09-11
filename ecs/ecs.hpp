@@ -1,9 +1,8 @@
-#include <any>
-#include <bitset>
+#pragma once
+
 #include <cstdint>
 #include <iostream>
 #include <memory>
-#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
@@ -73,7 +72,8 @@ class ECS {
 
 
 		template <typename... Components>
-		std::vector<ID> queryComponents() {
+		std::vector<std::tuple<Components&...>> query() {
+			std::vector<std::tuple<Components&...>> result;
 			// get the component with the smallest set from component manager (minimises bitmask checks that have to be done)
 			std::vector<ID> smallestSet = cm.getSmallest<Components ...>(); 
 
@@ -86,16 +86,17 @@ class ECS {
 			for (ID candidate : smallestSet) {
 				if ((em.getBitmask(candidate) & target) == target) {
 					// this means that the entity has all the components we require !!
-					matches.push_back(candidate);
+					result.emplace_back(getComponent<Components>(candidate)...);
 				}
 			}
 
-			return matches;
+			return result;
 		}
 
 		// sm functions
 		void registerSystem(std::unique_ptr<System> system) { sm.registerSystem(std::move(system)); }
-		void updateSystems() { sm.updateAll(cm, em); }
+		void updateSystems() { sm.updateAll(*this); }
+
 
 	private:
 		EntityManager em;

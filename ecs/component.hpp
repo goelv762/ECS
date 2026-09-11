@@ -2,8 +2,6 @@
 
 #include "types.hpp"
 
-#include <bitset>
-#include <climits>
 #include <iostream>
 #include <memory>
 #include <typeindex>
@@ -32,7 +30,7 @@ class SparseSet : public ISparseSet {
 			bool result = contains(id);
 			if (!result) {
 				std::cerr << "ID no. " << id << " does not exist in sparse set of type '" << getTypeName<Component>() << "'" << std::endl;
-				exit(result);
+				exit(EXIT_FAILURE);
 			}
 		}
 
