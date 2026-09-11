@@ -2,5 +2,5 @@
 add_library(ecs INTERFACE)
 add_library(ecs::ecs ALIAS ecs)
 
-target_include_directories(ecs INTERFACE ${CMAKE_SOURCE_DIR}/..)
+target_include_directories(ecs INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_compile_features(ecs INTERFACE cxx_std_20)
