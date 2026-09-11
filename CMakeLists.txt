@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LINKER_TYPE MOLD)
 
-add_subdirectory(tests)
 add_subdirectory(ecs)
-
-enable_testing()
+if(PROJECT_IS_TOP_LEVEL)
+	add_subdirectory(tests)
+	enable_testing()
+endif()
