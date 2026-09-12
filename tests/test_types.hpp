@@ -2,6 +2,7 @@
 
 #include "ecs/ecs.hpp"
 
+// these are to be used for components only
 struct A { int a; };
 struct B { int b; };
 struct C { int c; };

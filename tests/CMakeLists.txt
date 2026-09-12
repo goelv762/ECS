@@ -16,6 +16,7 @@ add_executable(ecs_tests
     entity.cc
     component.cc
 	system.cc
+	misc.cc
 )
 
 target_link_libraries(ecs_tests

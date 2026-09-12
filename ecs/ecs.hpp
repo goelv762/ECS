@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -97,9 +98,38 @@ class ECS {
 		void registerSystem(std::unique_ptr<System> system) { sm.registerSystem(std::move(system)); }
 		void updateSystems() { sm.updateAll(*this); }
 
+		// resources
+		template <typename ResourceType>
+		void initResource(ResourceType initialValue = {}) {
+			resources[std::type_index(typeid(ResourceType))] = initialValue;
+		}
+
+
+		template <typename ResourceType>
+		ResourceType& getResource() {
+			if (!resourceExists<ResourceType>()) {
+				std::cerr << "No resource exists with type " << getTypeName<ResourceType>() << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
+			std::any& resource = resources[std::type_index(typeid(ResourceType))];
+			return std::any_cast<ResourceType&>(resource);
+		}
+
+		template <typename ResourceType>
+		void deleteResource() {
+			resources.erase(std::type_index(typeid(ResourceType)));
+		}
 
 	private:
+		template <typename ResourceType>
+		bool resourceExists() {
+			return (resources.find(std::type_index(typeid(ResourceType))) != resources.end());
+		}
+
 		EntityManager em;
 		ComponentManager cm;
 		SystemManager sm;
+
+		std::unordered_map<std::type_index, std::any> resources;
 };

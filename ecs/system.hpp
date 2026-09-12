@@ -1,7 +1,7 @@
 #pragma once
 
-#include "component.hpp"
-#include "entity.hpp"
+#include <memory>
+#include <vector>
 
 // forward declaration
 class ECS;

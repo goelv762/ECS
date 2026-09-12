@@ -16,5 +16,9 @@ TEST(System, CreateUse) {
 
 	ecs.updateSystems();
 
+	ecs.initResource<int>(3);
+
 	EXPECT_EQ(ecs.getComponent<C>(entity).c, a + b + c);
+	EXPECT_EQ(ecs.getResource<int>(), 3);
 }
+
