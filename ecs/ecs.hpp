@@ -8,9 +8,12 @@
 #include <vector>
 
 #include "types.hpp"
+#include "resource.hpp"
+
 #include "entity.hpp"
 #include "component.hpp"
 #include "system.hpp"
+
 
 class ECS {
 	public:
@@ -98,38 +101,23 @@ class ECS {
 		void registerSystem(std::unique_ptr<System> system) { sm.registerSystem(std::move(system)); }
 		void updateSystems() { sm.updateAll(*this); }
 
-		// resources
-		template <typename ResourceType>
-		void initResource(ResourceType initialValue = {}) {
-			resources[std::type_index(typeid(ResourceType))] = initialValue;
-		}
-
+		// rm functions
 
 		template <typename ResourceType>
-		ResourceType& getResource() {
-			if (!resourceExists<ResourceType>()) {
-				std::cerr << "No resource exists with type " << getTypeName<ResourceType>() << std::endl;
-				exit(EXIT_FAILURE);
-			}
-
-			std::any& resource = resources[std::type_index(typeid(ResourceType))];
-			return std::any_cast<ResourceType&>(resource);
-		}
+		void initResource(ResourceType initialValue = {}) { rm.initResource(initialValue); }
 
 		template <typename ResourceType>
-		void deleteResource() {
-			resources.erase(std::type_index(typeid(ResourceType)));
-		}
+		ResourceType& getResource() { return rm.getResource<ResourceType>(); }
+
+		template <typename ResourceType>
+		void deleteResource() { rm.deleteResource<ResourceType>(); };
+		
 
 	private:
-		template <typename ResourceType>
-		bool resourceExists() {
-			return (resources.find(std::type_index(typeid(ResourceType))) != resources.end());
-		}
 
 		EntityManager em;
 		ComponentManager cm;
 		SystemManager sm;
-
-		std::unordered_map<std::type_index, std::any> resources;
+	
+		ResourceManager rm;
 };
